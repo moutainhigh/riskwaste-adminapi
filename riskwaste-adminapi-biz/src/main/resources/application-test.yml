@@ -1,0 +1,16 @@
+      
+spring: 
+  redis: 
+    host: 172.16.16.10
+    port: 6379
+    password: "lARiZ9ybhpSVNIgB"
+    database: 2
+  datasource:
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://172.16.16.10:3306/battery?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false"
+    username: "battery"
+    password: "KNVGZwp2wm3L3QyX"
+    
+# 开启swagger
+swagger:
+  enabled: false

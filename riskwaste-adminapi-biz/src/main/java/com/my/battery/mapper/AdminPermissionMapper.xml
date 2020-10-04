@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 后台权限表 Mapper 映射文件  -->
+<!-- Power By weibocy ! -->
+
+<mapper namespace="com.my.battery.mapper.AdminPermissionMapper">
+<!-- 读取所以权限列表，包含返回子权限节点 -->
+	<select id="selectListByChildren" resultMap="adminPermissionResult">
+		SELECT
+		*
+		FROM
+		admin_permission
+		WHERE
+		parent_no IS NULL
+		OR parent_no = ''
+	</select>
+	<!-- 结果映射 关联查询子权限 -->
+	<resultMap type="com.my.battery.mo.AdminPermissionMo" id="adminPermissionResult">
+		<collection property="children" select="selectAllChildren" column="parentNo=permission_no"></collection>
+	</resultMap>
+	<!-- 查询指定权限的子权限列表 -->
+	<select id="selectAllChildren" resultType="com.my.battery.mo.AdminPermissionMo">
+		SELECT
+		m.*,
+		p.permission_name AS parent_name
+		FROM
+		admin_permission m
+		INNER JOIN admin_permission p ON p.permission_no = m.parent_no
+		WHERE
+		m.parent_no = #{parentNo}
+	</select>
+</mapper>

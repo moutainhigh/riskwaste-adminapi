@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  riskwaste-appapi:
+    image: localhost:5000/riskwaste-adminapi:latest
+    container_name: "riskwaste-adminapi"
+    ports:
+    - "9056:9056"
+    environment:
+      RUN_ENV: test

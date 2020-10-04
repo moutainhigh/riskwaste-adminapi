@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 后台用户信息表 Mapper 映射文件  -->
+<!-- Power By weibocy ! -->
+
+<mapper namespace="com.my.battery.mapper.AdminUserMapper">
+<!-- 根据用户名查询用户以及所属角色和权限信息 -->
+	<select id="getByUsername" resultMap="adminUserResult">
+		SELECT
+		*
+		FROM
+		admin_user
+		WHERE
+		username = #{username}
+	</select>
+	<!-- 根据手机号或用户名查询用户以及所属角色和权限信息 -->
+	<select id="getByCellOrUsername" resultMap="adminUserResult">
+		SELECT
+		*
+		FROM
+		admin_user
+		WHERE
+		cell = #{cell} or username = #{username}
+	</select>
+	<!-- 后台用户结果映射 -->
+	<resultMap type="com.my.battery.mo.AdminUserMo" id="adminUserResult">
+		<!-- 所属角色映射 传入admin_user_no值做为查询参数 -->
+		<collection property="roles" select="selectAllRoles" column="adminUserNo=admin_user_no"></collection>
+	</resultMap>
+	<!-- 查询用户所属角色 -->
+	<select id="selectAllRoles" resultMap="rolesResult">
+		SELECT
+		admin_role.*
+		FROM
+		admin_user_role
+		JOIN admin_role ON admin_role.role_no = admin_user_role.role_no
+		WHERE
+		admin_user_role.admin_user_no = #{adminUserNo}
+	</select>
+	<!-- 所属角色结果映射 -->
+	<resultMap type="com.my.battery.mo.AdminRoleMo" id="rolesResult">
+		<collection property="permissions" select="selectAllPermissions" column="roleNo=role_no"></collection>
+	</resultMap>
+	<!-- 查询角色所属权限 -->
+	<select id="selectAllPermissions" resultType="com.my.battery.mo.AdminPermissionMo">
+		SELECT
+		p.*
+		FROM
+		admin_role_permission rp
+		JOIN admin_permission p ON
+		p.permission_no = rp.permission_no
+		WHERE
+		rp.role_no = #{roleNo}
+	</select>
+</mapper>

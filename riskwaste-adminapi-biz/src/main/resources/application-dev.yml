@@ -1,0 +1,22 @@
+debug: true
+ 
+spring:
+  redis: 
+    host: 192.168.8.102
+    port: 6379
+    password: ""
+    database: 2
+  datasource:
+    driverClassName: "com.mysql.cj.jdbc.Driver"
+    url: "jdbc:mysql://192.168.8.102:3306/battery?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true"
+    username: "root"
+    password: "123456"
+
+# 日志中打印sql
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    
+# 开启swagger
+swagger:
+  enabled: true

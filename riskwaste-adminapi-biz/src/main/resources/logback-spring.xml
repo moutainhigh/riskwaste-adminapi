@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+	<!-- 引入spring 默认的日志配置 -->
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+	
+	<!-- 应用名称 -->
+	<springProperty scope="context" name="springAppName" source="spring.application.name" />
+	
+	<!-- logstash地址 -->
+	<springProperty scope="context" name="logstash" source="logstash" defaultValue="127.0.0.1:5044" />
+
+	<!-- 定义统一日志目录 -->
+	<property name="log.path" value="./logs" />
+
+	<!-- logstash远程日志配置 JSON格式 -->
+	<appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+		<destination>${logstash}</destination>
+		<encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<timestamp>
+					<timeZone>GMT+08</timeZone>
+				</timestamp>
+				<pattern>
+					<pattern>
+						{
+						"level":"%level",
+                        "traceId":"%X{X-B3-TraceId:-}",
+                        "file":"%file",
+                        "line":"%line",
+                        "message":"%m%n",
+                        "logger": "%logger"
+						}
+					</pattern>
+				</pattern>
+			</providers>
+		</encoder>
+		<encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"appname":"${springAppName}"}</customFields>
+        </encoder>
+	</appender>
+
+
+	<!-- level为 INFO 日志，时间滚动输出 -->
+	<appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 正在记录的日志文档的路径及文档名 -->
+		<file>${log.path}/info.log</file>
+		<!--日志文档输出格式 -->
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+			<charset>UTF-8</charset> <!-- 此处设置字符集 -->
+		</encoder>
+		<!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.path}/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!--日志文档保留天数 -->
+			<maxHistory>15</maxHistory>
+		</rollingPolicy>
+		<!-- 此日志文档只记录info或者info以上级别的 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
+	</appender>
+
+	<!-- level为 WARN 日志，时间滚动输出 -->
+	<appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 正在记录的日志文档的路径及文档名 -->
+		<file>${log.path}/warn.log</file>
+		<!--日志文档输出格式 -->
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+			<charset>UTF-8</charset> <!-- 此处设置字符集 -->
+		</encoder>
+		<!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.path}/warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!--日志文档保留天数 -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<!-- 此日志文档只记录warn或者warn以上的级别 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
+	</appender>
+
+
+	<!-- 开发模式-日志配置 -->
+	<springProfile name="dev">
+		<root level="INFO">
+			<appender-ref ref="INFO_FILE" />
+		</root>
+		<logger name="org.mybatis" level="DEBUG" />
+		<logger name="org.apache.ibatis" level="DEBUG" />
+	</springProfile>
+
+	<!-- 测试模式-日志配置 -->
+	<springProfile name="test">
+		<root level="INFO">
+			<appender-ref ref="LOGSTASH" />
+			<appender-ref ref="INFO_FILE" />
+			<appender-ref ref="WARN_FILE" />
+		</root>
+	</springProfile>
+
+	<!-- 线上模式-日志配置 -->
+	<springProfile name="prod">
+		<root level="INFO">
+			<appender-ref ref="LOGSTASH" />
+			<appender-ref ref="INFO_FILE" />
+			<appender-ref ref="WARN_FILE" />
+		</root>
+	</springProfile>
+	<springProfile name="register1">
+		<root level="INFO">
+			<appender-ref ref="LOGSTASH" />
+			<appender-ref ref="INFO_FILE" />
+			<appender-ref ref="WARN_FILE" />
+		</root>
+	</springProfile>
+	<springProfile name="register2">
+		<root level="INFO">
+			<appender-ref ref="LOGSTASH" />
+			<appender-ref ref="INFO_FILE" />
+			<appender-ref ref="WARN_FILE" />
+		</root>
+	</springProfile>
+</configuration>
